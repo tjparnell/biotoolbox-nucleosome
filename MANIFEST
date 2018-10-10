@@ -1,0 +1,10 @@
+Build.PL
+CHANGES
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+bin/get_actual_nuc_sizes.pl
+bin/intersect_nucs.pl
+bin/map_nucleosomes.pl
+bin/verify_nucleosome_mapping.pl
