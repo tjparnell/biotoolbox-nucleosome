@@ -7,11 +7,9 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use Statistics::Lite qw(mean stddevp median min max);
-use Bio::ToolBox::legacy_helper qw(
+use Bio::ToolBox::Legacy qw(
 	load_data_file
 	write_data_file
-);
-use Bio::ToolBox::Extra qw(
 	convert_and_write_to_gff_file
 );
 eval {

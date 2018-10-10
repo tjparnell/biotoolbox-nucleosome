@@ -10,18 +10,16 @@ use Bio::ToolBox::db_helper qw(
 	open_db_connection
 	verify_or_request_feature_types
 	get_chromosome_list
-	get_region_dataset_hash
-	get_chromo_region_score
 );
-use Bio::ToolBox::legacy_helper qw(
+use Bio::ToolBox::Legacy qw(
 	generate_data_structure
 	write_data_file
-);
-use Bio::ToolBox::Extra qw(
+	get_region_dataset_hash
+	get_chromo_region_score
 	convert_and_write_to_gff_file
 );
 #use Data::Dumper;
-my $VERSION = '1.30';
+my $VERSION = '1.62';
 
 print "\n This script will map nucleosomes\n\n";
 

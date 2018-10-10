@@ -6,18 +6,16 @@ use strict;
 use Getopt::Long;
 use Statistics::Lite qw(min max mean stddevp);
 use Pod::Usage;
-use Bio::ToolBox::legacy_helper qw(
+use Bio::ToolBox::Legacy qw(
 	generate_data_structure
 	find_column_index
 	load_data_file
 	write_data_file
-);
-use Bio::ToolBox::Extra qw(
 	index_data_table
 	convert_and_write_to_gff_file
 );
 use Bio::ToolBox::utility;
-my $VERSION = '1.30';
+my $VERSION = '1.62';
 
 print "\n This script will intersect two lists of nucleosomes\n\n";
 
@@ -52,8 +50,8 @@ my (
 
 # Command line options
 GetOptions( 
-	'in1=s'      => \$infile1, # input file one
-	'in2=s'      => \$infile2, # input file two
+	'target=s'    => \$infile1, # input file one
+	'reference=s' => \$infile2, # input file two
 	'out=s'      => \$outfile, # output filename
 	'force_strand|set_strand' => \$set_strand, # artificially enforce a strand for target
 				# force_strand is preferred option, but respect the old option
@@ -94,46 +92,32 @@ unless (defined $gz) {$gz = 0}
 
 
 ### Load input files
-my $data1 = load_data_file($infile1) 
+my $target = load_data_file($infile1) 
 	or die " no data loaded from file '$infile1'!\n";
-print " Loaded $data1->{last_row} features from file '$infile1'\n"; 
+print " Loaded $data1->{last_row} target features from file '$infile1'\n"; 
 
-my $data2 = load_data_file($infile2) 
+my $reference = load_data_file($infile2) 
 	or die " no data loaded from file '$infile2'!\n";
-print " Loaded $data2->{last_row} features from file '$infile2'\n\n"; 
+print " Loaded $data2->{last_row} reference features from file '$infile2'\n\n"; 
 
 
 
 
 ### Intersection
 
-# we will assign the datasets as target and reference based on the number 
-# of features, reference always has more
+# warn about unequal numbers
+if ($target->{last_row} > $reference->{last_row}) {
+	print " Target nucleosome list is greater than reference! Are these backwards?\n";
+}
 
 # intersect the two lists
-my $output;
-if ($data1->{last_row} <= $data2->{last_row}) {
-	
-	# data1 is target, data2 is reference
-	print " Intersecting target list from '$data1->{basename}'\n" .
-		"    with\n reference list from '$data2->{basename}'...\n";
-	$output = intersect_nucs($data1, $data2);
-	
-	# generate report
-	print_statistics($output, $data1, $data2);
-}
+# data1 is target, data2 is reference
+print " Intersecting target list from '$data1->{basename}'\n" .
+	"    with\n reference list from '$data2->{basename}'...\n";
+my $output = intersect_nucs($target, $reference);
 
-else {
-	
-	# data2 is target, data1 is reference
-	print " Intersecting target list from '$data2->{basename}'\n" .
-		"    with\n reference list from '$data1->{basename}'...\n";
-	$output = intersect_nucs($data2, $data1);
-	
-	# generate report
-	print_statistics($output, $data2, $data1);
-}
-
+# generate report
+print_statistics($output, $data1, $data2);
 
 
 
@@ -655,8 +639,8 @@ A script to intersect two lists of nucleosomes.
 intersect_nucs.pl [--options...] <filename_1> <filename_2>
   
   Options:
-  --in1 <filename1>
-  --in2 <filename2>
+  --target <filename1>
+  --reference <filename2>
   --out <filename>
   --force_strand
   --gff
@@ -672,9 +656,9 @@ The command line flags and descriptions:
 
 =over 4
 
-=item --in1 <filename>
+=item --target <filename>
 
-=item --in2 <filename>
+=item --reference <filename>
 
 Specify two files of nucleosome lists. The files must contain sorted
 genomic position coordinates for each nucleosome. Supported file formats

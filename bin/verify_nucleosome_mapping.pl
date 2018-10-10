@@ -6,18 +6,18 @@ use strict;
 use Getopt::Long;
 use Pod::Usage;
 use Statistics::Lite qw(min max mean stddev);
-use Bio::ToolBox::legacy_helper qw(
+use Bio::ToolBox::Legacy qw(
 	find_column_index
 	load_data_file
 	write_data_file
+	get_region_dataset_hash
 );
 use Bio::ToolBox::db_helper qw(
 	open_db_connection
 	verify_or_request_feature_types
-	get_region_dataset_hash
 );
 use Bio::ToolBox::utility;
-my $VERSION =  '1.30';
+my $VERSION =  '1.62';
 
 print "\n This program will verify the mapping of nucleosomes\n\n";
 
@@ -187,7 +187,7 @@ unless ($dataset) {
 my $overlap_i = $data_ref->{'number_columns'};
 $data_ref->{$overlap_i} = {
 	'name'       => 'overlap_length',
-	'index'      => '$overlap_i',
+	'index'      => $overlap_i,
 };
 if ($filter) {
 	$data_ref->{$overlap_i}{'max_overlap'} = $max_overlap;
@@ -195,13 +195,13 @@ if ($filter) {
 my $mapping_i = $overlap_i + 1;
 $data_ref->{$mapping_i} = {
 	'name'       => 'center_peak_mapping',
-	'index'      => '$mapping_i',
+	'index'      => $mapping_i,
 	'dataset'    => $dataset,
 };
 my $offset_i = $overlap_i + 2;
 $data_ref->{$offset_i} = {
 	'name'       => 'center_peak_offset',
-	'index'      => '$offset_i',
+	'index'      => $offset_i,
 };
 $data_ref->{'number_columns'} += 3;
 $table->[0][$overlap_i] = 'overlap_length';
