@@ -24,7 +24,7 @@ my $build = Module::Build->new(
 	},
 	requires          => {
 		'Bio::ToolBox'            => 1.62,
-		'Bio::ToolBox::Extra'     => 1.62
+		'Bio::ToolBox::Legacy'    => 1.62
 	},
 	recommends        => {
 	},
