@@ -8,13 +8,73 @@ This is a collections of specialized scripts written for working with
 next-generation sequencing of MNase-digested mononucleosome DNA (MNase-Seq).
 At the time these were written many years ago (late 00s), there was little else 
 written for identifying, mapping, and working with nucleosomal reads. There are 
-a now a few other projects that do so. This package may not be the most accurate, 
-but they work in a relatively simple manner, at least for cerevisiae. 
+now a few other projects that do so. This package may not be the most accurate, 
+but it works reasonably well, at least for _S. cerevisiae_. 
 
 These were initially part of the [Bio::ToolBox](https://github.com/tjparnell/biotoolbox) 
 package, at least in early versions (earlier than 1.30). For a while, they were 
-part of the legacy [Bio::ToolBox::Extra](https://github.com/tjparnell/biotoolbox-extra) 
-package, but have now moved out into it's own.
+part of the legacy [Bio::ToolBox::Extra](https://github.com/tjparnell/biotoolbox-legacy) 
+package, but have now moved out on its own.
+
+# USAGE
+
+These scripts were written primarily for _S. cerevisiae_ nucleosomes. They may or may 
+not work with other model system. Since yeast have very well-ordered nucleosomes, it's 
+relatively easy to map them. This package has primarily four scripts.
+
+- `map_nucleosomes.pl`
+
+    This is the main script to map nucleosome positions. It maps based on the position 
+    of the peak of nucleosome fragment midpoints within an incrementally sliding window. 
+    Search windows are based relavent to the previously identified nucleosome, in 
+    accordance to nucleosome stacking laws. If you can pick out nucleosome positions 
+    just by eye from nucleosomal fragment midpoint data in a genome browser without fancy 
+    smoothing or hidden Markov model states, then this program will work. This, of 
+    course, presumes a good degree of duplicate fragment positions (stack of identical 
+    nucleosomes) which is common with MNaseSeq data, but PCR-duplication is a concern. 
+    You may wish to threshold duplicate percentages between replicates and/or conditions 
+    using `bam_partial_dedup` from the 
+    [MultiRepMacsChIPSeq](https://github.com/HuntsmanCancerInstitute/MultiRepMacsChIPSeq) 
+    package. 
+    
+    Generate bigWig files of nucleosome midpoint data using, for example, 
+    [bam2wig.pl](https://metacpan.org/pod/bam2wig.pl). Either single- or paired-end 
+    alignments could and have been used successfully. 
+
+- `verify_nucleosome_mapping.pl`
+
+    This is an optional script, but will verify how well the nucleosomes were mapped 
+    with the script above, and optionally re-adjust and/or discard nucleosomes. 
+    Probably a good idea to do so.
+
+- `get_actual_nuc_sizes.pl`
+
+    A script to take the mapped nucleosomes, grab the actual paired-end alignments from 
+    the original Bam file, and try to calculate the actual nucleosome size. YMMV
+
+- `intersect_nucs.pl`
+
+    A script to take two list files of mapped nucleosomes, and intersect them, 
+    identifying which nucleosomes overlap and calculating some rudimentary statistics. 
+    May be marginally useful....
+
+- `correlate_position_data.pl`
+
+    This script is not part of this package but rather part of the 
+    [Bio::ToolBox](https://github.com/tjparnell/biotoolbox) package and is particularly 
+    useful here when working with nucleosomal data between different conditions. It will 
+    identify differences in the spatial position of signal over defined intervals, such 
+    as mapped nucleosomes. Differences between two datasets can be reported with a p-value, 
+    and importantly, an optimal shift in the signal. In other words, if the nucleosome 
+    signal in a mutant condition has shifted relavent to wildtype, this program will 
+    identify it, with caveats to the original mapping, nucleosome fuzziness, etc. 
+
+## Identifying positioned nucleosomes in yeast
+
+The subfolder `yeast_positioned_nucleosomes` contains a bash script for using a number 
+of BioToolBox programs for identifying positioned nucleosomes, i.e. the plus1, plus2, 
+plus3, etc nucleosomes over each transcript. It may be useful to you, either as is or 
+with modifications.
 
 # REQUIREMENTS
 
