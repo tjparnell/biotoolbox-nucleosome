@@ -94,11 +94,11 @@ unless (defined $gz) {$gz = 0}
 ### Load input files
 my $target = load_data_file($infile1) 
 	or die " no data loaded from file '$infile1'!\n";
-print " Loaded $data1->{last_row} target features from file '$infile1'\n"; 
+print " Loaded $target->{last_row} target features from file '$infile1'\n"; 
 
 my $reference = load_data_file($infile2) 
 	or die " no data loaded from file '$infile2'!\n";
-print " Loaded $data2->{last_row} reference features from file '$infile2'\n\n"; 
+print " Loaded $reference->{last_row} reference features from file '$infile2'\n\n"; 
 
 
 
@@ -111,13 +111,12 @@ if ($target->{last_row} > $reference->{last_row}) {
 }
 
 # intersect the two lists
-# data1 is target, data2 is reference
-print " Intersecting target list from '$data1->{basename}'\n" .
-	"    with\n reference list from '$data2->{basename}'...\n";
+print " Intersecting target list from '$target->{basename}'\n" .
+	"    with\n reference list from '$reference->{basename}'...\n";
 my $output = intersect_nucs($target, $reference);
 
 # generate report
-print_statistics($output, $data1, $data2);
+print_statistics($output, $target, $reference);
 
 
 
@@ -127,8 +126,8 @@ print_statistics($output, $data1, $data2);
 # write data file
 unless ($outfile) {
 	# make up a filename
-	$outfile = 'intersection_' . $data1->{'basename'} . '_' . 
-		$data2->{'basename'};
+	$outfile = 'intersection_' . $target->{'basename'} . '_' . 
+		$reference->{'basename'};
 }
 my $success = write_data_file(
 	'data'     => $output,
