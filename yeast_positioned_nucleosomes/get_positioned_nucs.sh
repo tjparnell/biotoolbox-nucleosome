@@ -16,9 +16,12 @@ if [ -z "$DATABASE" ]
 then
 	echo " Please provide the name of a Bio::DB::SeqFeature::Store database containing"
 	echo " both transcripts and all mapped nucleosomes loaded into it. See documentation."
-	echo " Also provide the text for the source_tag (column 3) for the nucleosome gff file"
+	echo " Also provide the text for the source_tag (column 3) for the nucleosome gff file."
+	echo " This source_tag value is used for the output name."
+	echo " These values are not checked and the script will fail in ugly ways if not accurate."
+	echo " BioToolBox applications are expected to be in the PATH"
 	echo
-	echo " $0 <SacCer3_nuc.db> <source_tag>"
+	echo " $0 <database> <source_tag>"
 	echo 
 	exit
 else
@@ -64,35 +67,33 @@ done
 echo
 echo
 echo
-echo "####### Collecting TSS positioned nucleosome ########"
+echo "####### Collecting positioned nucleosome ########"
 # plus 1 nucleosome
-echo "# collecting plus1 nuc"
+echo; echo "# collecting plus1 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start=0 --stop 125 --ref start --out ${NAME}_nuc_plus1
 
 # plus 2 nucleosome
-echo "# collecting plus2 nuc"
+echo; echo "# collecting plus2 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start 150 --stop 275 --ref start --out ${NAME}_nuc_plus2
 
 # plus 3 nucleosome
-echo "# collecting plus3 nuc"
+echo; echo "# collecting plus3 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start 300 --stop 450 --ref start --out ${NAME}_nuc_plus3
 
 # plus 4 nucleosome
-echo "# collecting plus4 nuc"
+echo; echo "# collecting plus4 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start 475 --stop 600 --ref start --out ${NAME}_nuc_plus4
 
 # terminal nucleosome
-echo "# collecting term1 nuc"
+echo; echo "# collecting term1 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start -100 --stop 25 --pos 3 --ref start --out ${NAME}_nuc_term1
 
 # minus 1 nucleosome all genes
-# most minus1 nucleosomes are actually terminal or plus1 nucleosomes, and actual minus1
-# are from larger intergenic regions, so take it from the prom500 list instead
-echo "# collecting all minus1 nuc"
+echo; echo "# collecting all minus1 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list.txt --start=-250 --stop=-125 --ref start --out ${NAME}_nuc_minus1
 
 # minus 2 nucleosome -500 free genes
-echo "# collecting prom500 minus2 nuc"
+echo; echo "# collecting prom500 minus2 nuc"
 get_intersecting_features.pl --feature nucleosome:$NAME --in transcript_list_prom500.txt --start=-400 --stop=-275 --ref start --out ${NAME}_nuc_minus2
 
 
@@ -151,24 +152,25 @@ done
 
 # merge the files into one unfiltered file
 # this is a specific order to emphasize the roles, priority to first occurrence
-echo "# joining nucleosome files into unfiltered merged list"
+echo; echo "# joining nucleosome files into unfiltered merged list"
 join_data_file.pl --out ${NAME}_nucs_unfiltered.txt ${NAME}_nuc_plus1 ${NAME}_nuc_plus2 ${NAME}_nuc_plus3 ${NAME}_nuc_plus4 ${NAME}_nuc_term1 ${NAME}_nuc_minus1 ${NAME}_nuc_minus2
 
+# sort by genomic coordinates
 manipulate_datasets.pl --func gsort --in ${NAME}_nucs_unfiltered.txt
 
 
 # prioritize plus1 and terminal nucleosomes over minus1
-# specific order
-echo "# merging and prioritizing intergenic nucleosomes"
+# specific order to emphasize priority
+echo; echo "# merging and prioritizing intergenic nucleosomes"
 join_data_file.pl --out ${NAME}_intergenic_nucs.txt ${NAME}_nuc_plus1 ${NAME}_nuc_term1 ${NAME}_nuc_minus1 ${NAME}_nuc_minus2.txt
-# discard duplicates, will keep first occurrence, which will be either plus1 or term1
+# discard duplicates, will keep first occurrence, which should be either plus1 or term1
 manipulate_datasets.pl --func duplicate --index 0 --in ${NAME}_intergenic_nucs.txt
 
 
 
 # delete the duplicate nucleosomes
 # first need to perform some sorting
-echo "# merging and sorting nucleosomes"
+echo; echo "# merging and sorting nucleosomes"
 # merge the remaining nucleosome files with the filtered intergenic nucleosomes
 join_data_file.pl --out ${NAME}_nucs.txt ${NAME}_intergenic_nucs.txt ${NAME}_nuc_plus2.txt ${NAME}_nuc_plus3.txt ${NAME}_nuc_plus4.txt
 # first sort by decreasing overlap amount
@@ -177,23 +179,23 @@ manipulate_datasets.pl --func sort --index 6 --dir d --in ${NAME}_nucs.txt
 manipulate_datasets.pl --func sort --index 0 --dir i --in ${NAME}_nucs.txt
 
 
-echo "# removing duplicate nucleosomes"
+echo; echo "# removing duplicate nucleosomes"
 # this will take the first occurring nucleosome, and discard subsequent 
 # nucleosomes sorted by role, overlap, name in increasing priority
 manipulate_datasets.pl --func duplicate --index 0 --in ${NAME}_nucs.txt
 # re-sort by genomic coordinate
 manipulate_datasets.pl --func gsort --in ${NAME}_nucs.txt
 
-# cleaning up and making backup
+# cleaning up
 rm ${NAME}_nuc_plus1.txt ${NAME}_nuc_plus2.txt ${NAME}_nuc_plus3.txt ${NAME}_nuc_plus4.txt ${NAME}_nuc_minus1.txt ${NAME}_nuc_minus2.txt ${NAME}_nuc_term1.txt ${NAME}_intergenic_nucs.txt 
 
 # split the file 
-echo "# splitting nucleosome file"
+echo; echo "# splitting nucleosome file"
 split_data_file.pl --index 2 ${NAME}_nucs.txt
 
 for nuc in nuc_plus1 nuc_plus2 nuc_plus3 nuc_plus4 nuc_minus1 nuc_minus2 nuc_term1
 do
-	echo "# cleaning up file $name"
+	echo; echo "# cleaning and exporting $name"
 	# change the name
 	mv ${NAME}_nucs\#${nuc}.txt ${NAME}_${nuc}.txt
 	
@@ -207,4 +209,5 @@ do
 	
 done
 
+echo;echo "#### Finished #####"
 
