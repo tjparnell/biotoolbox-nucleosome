@@ -41,13 +41,20 @@ relatively easy to map them. This package has primarily four scripts.
     [bam2wig.pl](https://metacpan.org/pod/bam2wig.pl). Either single- or paired-end 
     alignments could and have been used successfully. 
     
-    UPDATE: Actually, working with "skinny" nucleosome coverage appears to give the 
-    best results. Generate nucleosome coverage over the central 50% (or less) portion 
-    of the nucleosome. With single-end alignments and `bam2wig.pl`, use 
-    `--shift 37 --extend 75` to generate "skinny" nucleosomes. This "accentuates" the 
-    nucleosome occupancy curves while averaging out the density of nucleosome midpoints. 
-    There are much fewer "off-center" nucleosomes, fewer overlaps, and fewer "weak" 
-    nucleosomes called (because you can increase stringency) with this technique.
+    *UPDATE*: Actually, working with "skinny" nucleosome coverage appears to give the
+    best results. Generate nucleosome coverage over the central 50% (or less) portion
+    of the nucleosome. This "accentuates" the nucleosome occupancy curves while
+    averaging out the density of nucleosome midpoints. There are much fewer
+    "off-center" nucleosomes, fewer overlaps, and fewer "weak" nucleosomes called
+    (because you can increase stringency) with this technique. Generate skinny
+    nucleosome coverage from single-end alignments with
+    [bam2wig.pl](https://metacpan.org/pod/bam2wig.pl):
+    
+        bam2wig.pl --extend --extval 75 --shift --shiftval 37 --rpm --bin 1 --bw --in file.bam
+    
+    With paired-end data, use center-span:
+    
+        bam2wig.pl --pe --cspan --extval 75 -rpm --bin 1 --bw --in file.bam
 
 - `verify_nucleosome_mapping.pl`
 
