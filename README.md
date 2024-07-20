@@ -13,7 +13,7 @@ but it works reasonably well, at least for _S. cerevisiae_.
 
 These were initially part of the [Bio::ToolBox](https://github.com/tjparnell/biotoolbox) 
 package, at least in early versions (earlier than 1.30). For a while, they were 
-part of the legacy [Bio::ToolBox::Extra](https://github.com/tjparnell/biotoolbox-legacy) 
+part of the legacy [Bio::ToolBox::Legacy](https://github.com/tjparnell/biotoolbox-legacy) 
 package, but have now moved out on its own.
 
 # USAGE
@@ -98,19 +98,24 @@ command-line environment. They have been developed and tested on Mac
 OS X and linux; Microsoft Windows compatability is not tested nor 
 guaranteed.
 
-These scripts require the installation of [Bio::ToolBox](https://github.com/tjparnell/biotoolbox), 
-and all the requirements therein, especially notably a Bam and bigWig file 
-adapters. There are advanced installation instructions on the BioToolBox page.
+These scripts require the installation of 
+[Bio::ToolBox](https://github.com/tjparnell/biotoolbox), specifically version 1.69,
+and all the requirements therein, particularly Bam and bigWig file adapters. There are 
+[installation instructions](https://tjparnell.github.io/biotoolbox/AdvancedInstallation.html)
+on the BioToolBox page.
 
-This will also require the [Bio::ToolBox::Legacy](https://github.com/tjparnell/biotoolbox-legacy) 
-module as well. 
+This will also require the
+[Bio::ToolBox::Legacy](https://github.com/tjparnell/biotoolbox-legacy) 
+module as well. **NOTE**: This requires Bio::ToolBox version 1.69; it is 
+incompatible with the latest versions.
 
 # INSTALLATION
 
-Installation is simple with the standard Perl incantation.
+Installation is simple with the standard Perl incantation. However, it's highly 
+recommended to install prerequisites and dependencies first. See the Bio::ToolBox 
+[installation page](https://tjparnell.github.io/biotoolbox/AdvancedInstallation.html). 
 
     perl ./Build.PL
-    ./Build installdeps     # if necessary
     ./Build
     ./Build install
 

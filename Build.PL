@@ -23,8 +23,12 @@ my $build = Module::Build->new(
 		'Module::Build'           => 0,
 	},
 	requires          => {
-		'Bio::ToolBox'            => 1.62,
-		'Bio::ToolBox::Legacy'    => 1.62
+		'Bio::Root::Version'            => 1.007002,
+		'Bio::DB::SeqFeature::Store'    => 0,
+		'Bio::DB::HTS'                  => 3.01,
+		'Bio::DB::Big'                  => 1.0,
+		'Bio::ToolBox'                  => >= 1.66, < 1.70,
+		'Bio::ToolBox::Legacy'          => 1.62
 	},
 	recommends        => {
 	},
